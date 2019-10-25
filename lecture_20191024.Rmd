@@ -237,15 +237,89 @@ sim_regression(3000)
 
 ```
 
+# Scrape napoleon dynamite data:
 
 ```{r}
+#named url
+url = "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviewerType=avp_only_reviews&sortBy=recent&pageNumber=1"
 
+# use rvest package to get all html stuff on the page:
+dynamite_html = read_html(url)
 
+# using the selector gadget can get nodes:
+review_titles = dynamite_html %>%
+  html_nodes("#cm_cr-review_list .review-title") %>%
+  html_text()
 
+review_stars = dynamite_html %>%
+  html_nodes("#cm_cr-review_list .review-rating") %>%
+  html_text()
+
+review_text = dynamite_html %>%
+    html_nodes(".review-data:nth-child(4)") %>%
+    html_text()
+
+reviews = tibble(
+  title = review_titles,
+  stars = review_stars,
+  text = review_text
+)
 
 ```
 
+what if want page 2? can change url end to have a 2 instead of a 1, but can write a function to get any page of reviews:
 
+```{r}
 
+read_page_reviews <- function(url) {
+  
+  h = read_html(url)
+  
+  review_titles = h %>%
+    html_nodes("#cm_cr-review_list .review-title") %>%
+    html_text()
+  
+  review_stars = h %>%
+    html_nodes("#cm_cr-review_list .review-rating") %>%
+    html_text() %>%
+    str_extract("\\d") %>%
+    as.numeric()
+  
+  review_text = h %>%
+    html_nodes(".review-data:nth-child(4)") %>%
+    html_text()
+  
+  tibble(
+    title = review_titles,
+    stars = review_stars,
+    text = review_text
+  )
+}
+
+```
+
+```{r}
+
+read_page_reviews("https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviewerType=avp_only_reviews&sortBy=recent&pageNumber=6")
+
+```
+
+# Scoping
+
+```{r}
+
+f = function(x) {
+  z = x + y
+  z
+}
+
+x = 1
+y = 2
+
+f(x = y)
+
+#produces 4 because, argument is x so wherever x exists in the function it will use what you passed into it. y is a number that is not being passed into the function, so it looks elsewhere for y and will look outside of the function and into environment. 
+
+```
 
 
