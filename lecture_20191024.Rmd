@@ -152,8 +152,100 @@ mean_and_sd(x = y)
 
 ```{r}
 
+sim_data = tibble(
+  x = rnorm(30, mean = 1, sd = 1),
+  y = 2 + 3 * x + rnorm(30, 0, 1)
+)
+
+ls_fit = lm(y ~ x, data = sim_data)
+  
+# use coef to extract linear model coefs (slope and intercept, [1] is intercept, [2] is the slope).
+
+beta0_hat = coef(ls_fit)[1]
+beta1_hat = coef(ls_fit)[2]
+
+```
+
+```{r}
+
+sim_regression = function(n) {
+  
+  sim_data = tibble(
+    x = rnorm(n, mean = 1, sd = 1),
+    y = 2 + 3 * x + rnorm(n, 0, 1)
+  )
+  
+  ls_fit = lm(y ~ x, data = sim_data)
+  
+  tibble(
+    beta0_hat = coef(ls_fit)[1],
+    beta1_hat = coef(ls_fit)[2]
+  )
+}
+
+sim_regression(n = 30)
+
+#repeatedly running the function gives different estimates every time. Increasing sample size will get closer to slope of 3 and int of 2.
+
+sim_regression(n = 3000)
+
+```
+
+
+```{r}
+
+sim_regression = function(n, beta0, beta1) {
+  
+  sim_data = tibble(
+    x = rnorm(n, mean = 1, sd = 1),
+    y = beta0 + beta1 * x + rnorm(n, 0, 1)
+  )
+  
+  ls_fit = lm(y ~ x, data = sim_data)
+  
+  tibble(
+    beta0_hat = coef(ls_fit)[1],
+    beta1_hat = coef(ls_fit)[2]
+  )
+}
+
+sim_regression(n = 3000, beta0 = 17, beta1 = -3)
+sim_regression(n = 30, beta0 = 17, beta1 = -3)
+
+```
+
+```{r}
+
+# can set defaults unless user changes them:
+
+sim_regression = function(n, beta0 = 2, beta1 = 3) {
+  
+  sim_data = tibble(
+    x = rnorm(n, mean = 1, sd = 1),
+    y = beta0 + beta1 * x + rnorm(n, 0, 1)
+  )
+  
+  ls_fit = lm(y ~ x, data = sim_data)
+  
+  tibble(
+    beta0_hat = coef(ls_fit)[1],
+    beta1_hat = coef(ls_fit)[2]
+  )
+}
+
+sim_regression(3000)
+
+```
+
+
+```{r}
+
+
 
 
 ```
+
+
+
 
 
